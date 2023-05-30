@@ -1,0 +1,165 @@
+import React, { useEffect, useState, useRef} from 'react'
+import { View, Text } from 'react-native'
+import TreeView from 'react-native-final-tree-view'
+import axios from 'axios'
+import { Button } from 'react-native-paper';
+
+
+export default function ceshi() {
+    const [flag,setFlag]= useState(true);
+    const [treelist,setTreelist]= useState<any>();
+    const treeRef =useRef(treelist);
+    function getchild(arr, arr1) {
+        for (let i in arr.cam) {
+            if (!arr.cam[i].strName) {
+                for (var j in arr1) {
+                    if (arr.cam[i].strToken == arr1[j].strToken) {
+                        var node1 = [{
+                            strToken: arr1[j].strToken,
+                            streamprofile: "main",
+                            strName: '主码流',
+                            name: arr1[j].strName + "--" + '主码流',
+                            iconclass: 'listpng',
+                        }, {
+                            strToken: arr1[j].strToken,
+                            streamprofile: "sub",
+                            strName: '辅码流',
+                            name: arr1[j].strName + "--" + '辅码流',
+                            iconclass: 'listpng',
+                        }]
+                        arr.cam[i].node = node1;
+                        arr.cam[i].strName = arr1[j].strName;
+                        arr.cam[i].name = arr1[j].strName + "--" + '主码流';
+                        arr.cam[i].bOnline = arr1[j].bOnline;
+                        arr.cam[i].iconclass = "listpng2"
+                        if (!arr1[j].bOnline)
+                            arr.cam[i].iconclass = 'mdi mdi-camcorder-off fa-fw';
+
+                        if (arr1[j].nConnectType == 'H5_CLOUD')
+                            arr.cam[i].iconclass = 'listpng2';
+
+                        if (arr1[j].bRec == true)
+                            arr.cam[i].iconclass2 = 'iconfont icon-radioboxfill none';
+                    }
+                }
+            }
+        }
+        if (arr.node && arr.node.length > 0) {
+            for (let i = 0; i < arr.node.length; i++) {
+                arr.node[i] = getchild(arr.node[i], arr1);
+            }
+        }
+        return arr;
+    }
+    function datapush(data) {
+        a(data)
+        return data;
+    }
+
+    const a = (data) => {
+        console.log('datacam:', data.cam);
+        if (data.node.length != 0) {
+            for (let i = 0; i < data.node.length; i++) {
+                data.cam.push(data.node[i])
+            }
+        }
+        delete data.node
+        if (data.cam) {
+            for (let i = 0; i < data.cam.length; i++) {
+                b(data.cam[i]);
+                let data1 = [];
+                data1.push(data);
+            }
+        }
+    };
+    const b = (data) => {
+        if (data.node) {
+            for (let i = 0; i < data.node.length; i++) {
+                if (data.cam) {
+                    data.cam.push(data.node[i])
+                }
+            }
+        }
+        delete data.node;
+        if (data.cam) {
+            for (let i = 0; i < data.cam.length; i++) {
+                if (data.cam[i].cam) {
+                    c(data.cam[i])
+                }
+            }
+        }
+    };
+    const c = (data) => {
+        if (data.node) {
+            for (let i = 0; i < data.node.length; i++) {
+                if (data.cam) {
+                    data.cam.push(data.node[i])
+                }
+            }
+            delete data.node;
+        }
+    }
+
+    //展开
+    function getIndicator(isExpanded, hasChildrenNodes) {
+        if (!hasChildrenNodes) {
+            return '-'
+        } else if (isExpanded) {
+            return '\\/'
+        } else {
+            return '>'
+        }
+    }
+
+
+    useEffect(() => {
+        axios.get('http://192.168.100.105:8080/api/v1/GetRegion?session=90437319-3521-49ef-9684-53c5bc7ab7a4')
+            .then(function (response) {
+                console.log('数据', response)
+
+                let oldarr = response.data.root;
+                let oldarr1 = response.data.src;
+
+
+                let dataroot = getchild(oldarr, oldarr1);
+                let nodelist = datapush(dataroot);
+                console.log('nodelist:',nodelist)
+                let nodelist1 = JSON.stringify(nodelist);
+                console.log('hh',nodelist1);
+                setTreelist(nodelist1);
+                treeRef.current = nodelist1;
+                console.log('TREELIST:',treelist)
+                console.log('列表：',treeRef.current);
+
+                
+            }).catch(error => { console.error(error) })
+
+    }, [])
+
+
+
+
+    return (
+        <View>
+            <TreeView
+                data={treelist} 
+                renderNode={({ node, level, isExpanded, hasChildrenNodes }) => {
+                    return (
+                        <View>
+                            <Text
+                                style={{
+                                    marginLeft: 25 * level,
+                                }}
+                            >
+                                {getIndicator(isExpanded, hasChildrenNodes)} {node.strName}
+                            </Text>
+                        </View>
+                    )
+                }}
+                idKey="strName"
+                childrenKey="cam"
+            />
+            
+        </View>
+    )
+}

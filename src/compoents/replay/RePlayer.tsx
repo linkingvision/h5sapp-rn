@@ -1,0 +1,340 @@
+import React from 'react'
+import {
+	Button,
+	SafeAreaView,
+	StyleSheet,
+	ScrollView,
+	View,
+	Text,
+	StatusBar,DeviceEventEmitter
+  } from 'react-native';
+import { useRef, useState, useEffect, } from 'react';
+// import { Colors } from 'react-native/Libraries/NewAppScreen';
+
+import {
+	RTCPeerConnection,
+	RTCIceCandidate,
+	RTCSessionDescription,
+	RTCView,
+	MediaStream,
+	MediaStreamTrack,
+	mediaDevices,
+	registerGlobals
+} from 'react-native-webrtc';
+//及时更新
+// import useSyncCallback from '../../hooks/useSyncCallback';
+
+
+//mobx 
+import {observer, useLocalObservable, useObserver} from 'mobx-react'
+import store from '../../store/store'
+import { RootState } from '../../store/index'
+import { useSelector, useDispatch } from 'react-redux'
+interface Myplayer{
+	width:number;
+	height:number;
+}
+const  starttime= new Date()
+var year = starttime.getFullYear();
+var month = starttime.getMonth() + 1;
+var strDate = starttime.getDate();
+var strDate1 = starttime.getDate()-1;
+var localOffset = Math.abs(starttime.getTimezoneOffset() /60);
+console.log(starttime,year,month,strDate,strDate1,localOffset,['年月日']);
+var timevalues=year+"-"+month+"-"+strDate+"T"+"00:00:00"+"+0"+localOffset+":00";
+var timevalues1=year+"-"+month+"-"+strDate1+"T"+"00:00:00"+"+0"+localOffset+":00";
+var timevaluee=year+"-"+month+"-"+strDate+"T"+"23:59:59"+"+0"+localOffset+":00";
+var PlaybackCBinterval: any;
+var timeLine : any
+const Player=()=>{
+	const videoOne =  useSelector((state: RootState) =>state.replay.videoOne)
+	const Adswitch=  useSelector((state: RootState) =>state.replay.Adswitch)
+	console.log(111111111111111111111,Adswitch);
+	// const onstartTime =  useSelector((state: RootState) =>state.replay.startTime)
+	// console.log(videoOne,onstartTime,['传递过来的时间']);
+	// console.log(RootState,11111111111111111111111111111111111);
+	const [ stream, setStream] = useState(null );
+	const [ remoteStream, setRemoteStream ] = useState( null );
+	const remoteStreamRef = useRef(remoteStream);
+	const [ pc, setPc ] = useState(new RTCPeerConnection());
+	var RefreshToken = '';
+	var RefreshStart = '';
+	var RefreshEnd = '';
+	// const [ ws, setWs ] = useState(
+	// 	new WebSocket(
+	// 		'ws://192.168.100.105:8080/api/v1/h5srtcapi?token='+''+'&profile=main&session=c1782caf-b670-42d8-ba90-2244d0b0ee83'
+	// 	)
+	// );
+	// const [ws,setWs] = useState(new WebSocket('ws://'+store.data.host+':'+store.data.port+'/api/v1/h5srtcapi?token='+store.data.video2+'&profile=main&session='+store.data.session+''))
+	const [ iceConnectionState, setIceConnectionState ] = useState();
+	// const url = 'ws://'+'192.168.100.127'+':'+'8080'+'/api/v1/h5srtcapi?token='+'6aa4--0'+'&profile=main&session='+'cd004ffd-5e59-4a40-8096-5e8af4275c72';
+	// DeviceEventEmitter.addListener('Adswitch',Adswitch)
+	DeviceEventEmitter.addListener('Refresh1',(data)=>{
+		console.log(data);
+		RefreshToken = data.token;
+		RefreshStart = data.starf;
+		RefreshEnd = data.end;
+	})
+	console.log(RefreshToken);
+	
+	const url = 'ws://'+store.data.host+':'+store.data.port+'/api/v1/h5srtcapi?token='+store.data.RefreshToken+'&playback=true&profile=main&serverpb='+Adswitch+'&begintime='+store.data.RefreshStart+'&endtime='+store.data.RefreshEnd+'&filename=fake&session='+store.data.session;
+	// const url ='ws://'+store.data.host+':'+store.data.port+'/api/v1/h5srtcapi?token='+videoOne+'&playback=true&profile=main&serverpb=true&begintime=2022-05-18T00%3A30%3A00%2B08%3A00&endtime=2022-05-182T23%3A59%3A59%2B08%3A00&filename=fake&session='+store.data.session;
+	console.log('====================================');
+	console.log(url,['url']);
+	console.log('====================================');
+	const [ws,setWs] = useState(new WebSocket(url))
+	// const setT1 = (s) => {
+    //     setWs(new WebSocket('ws://192.168.100.105:8080/api/v1/h5srtcapi?token='+s+'&profile=main&session=c1782caf-b670-42d8-ba90-2244d0b0ee83'));
+    //     func();
+    // }
+    // const func = useSyncCallback(() => {
+    //    console.log('进去了回调函数')
+    // })
+
+	// useEffect(()=>{
+	// //对WS进行初始化
+	// console.log('ws的值为',ws)
+	// setT1(store.data.token)
+	// console.log('ws的值为',ws)
+	// },[store.data.token])
+
+	useEffect(() => {
+		if (ws!= new WebSocket('ws://localhost:8080') ){
+		// ws.close()
+		ws.onopen = () => {
+			console.log('连接开始了');
+
+			let j = {};
+			j.type = 'open';
+			ws.send(JSON.stringify(j));
+			let k = {};
+			k.cmd = "H5_START";
+			ws.send(JSON.stringify(k));
+		};
+
+		DeviceEventEmitter.addListener('timeline',(timeline)=>{
+		 timeLine  =timeline
+		console.log('====================================');
+		console.log(timeLine);
+		console.log('====================================');
+		})
+		ws.onmessage = (msg) => {
+			let data = JSON.parse(msg.data);
+			console.log('[DATA:]',data);
+			if (data.type === 'H5S_EVENT_PB_TIME'){
+				var starf=new Date(store.data.RefreshStart).getTime()/1000;
+				var endd=new Date(data.pbTime.strTime).getTime()/1000;
+				var staefend=endd-starf;
+				// store.changeTimelink(staefend);
+				// console.log(['store.data.timelink'],staefend,store.data.timelink);
+				// DeviceEventEmitter.emit('sliderValue',staefend)
+			}
+			
+			// if (data.type === 'H5S_EVENT_PB_TIME')
+			// {
+			// 	clearInterval(PlaybackCBinterval)
+			// 	var time = new Date(data.pbTime.strTime).getTime();
+			// 	var times = new Date(data.pbTime.strTime).getTime()+1000;
+			// 	PlaybackCBinterval = setInterval(()=>{
+			// 		time=time+50*Number(1)
+			// 		if (time>=times) {
+			// 			clearInterval(PlaybackCBinterval)
+						
+			// 		}else{
+			// 			// timeLine.set_time_to_middle(time)
+			// 		}
+			// 	},50)
+			// }
+			if (data.type=='videochanged') {
+				console.log(data.type);
+				DeviceEventEmitter.emit('ReplayhideImage');
+			}
+			switch (data.type) {
+				case 'offer':
+					console.log('正在进入offer处理');
+
+					handleOffer(data);
+					break;
+				case 'iceserver':
+					console.log('iceserver 进入中······');
+					break;
+				case 'remoteice':
+					console.log('remoteice,进入中里面是', data);
+					onRemoteICECandidate(data);
+					break;
+				// case 'videochanged':
+
+				default:
+                    console.log('默认返回')
+					break;
+			}
+
+			ws.onerror = function(err) {
+				console.log('错误是：', err);
+			};
+		};
+
+
+		const puase = ()=>{
+			var j = {};
+			j.cmd = "H5_PAUSE";
+			ws.send(JSON.stringify(j));
+		}
+		DeviceEventEmitter.addListener('pause',(node)=>{
+			console.log('暂停');
+			
+			var j = {};
+			j.cmd = "H5_PAUSE";
+			ws.send(JSON.stringify(j));
+		})
+		DeviceEventEmitter.addListener('Replay',(node)=>{
+			var j = {};
+			j.cmd = "H5_RESUME";
+			ws.send(JSON.stringify(j));
+		})
+		DeviceEventEmitter.addListener('Speed',(speed)=>{
+			var j = {};
+			j.cmd = "H5_SPEED";
+			j.nSpeed = speed;
+			ws.send(JSON.stringify(j));
+		})
+		DeviceEventEmitter.addListener('changetime',(day)=>{
+			timevalues = day.dateString+"T"+"00:00:00"+"+0"+8+":00";
+			timevaluee =  day.dateString+"T"+"23:59:59"+"+0"+8+":00";
+		})
+		DeviceEventEmitter.addListener('timelinn',(timelink)=>{
+			DeviceEventEmitter.emit('pause')
+			DeviceEventEmitter.emit('Replay')
+			var j = {};
+			j.cmd = "H5_SEEK";
+			j.nSeekTime = parseInt(timelink);
+			console.log('====================================');
+			console.log(j);
+			console.log('====================================');
+			ws.send(JSON.stringify(j));
+		})
+		// pc.onicecandidate =(event)=> {
+		// 	console.log('====================================');
+		// 	console.log(event);
+		// 	console.log('====================================');
+		//     if (event.candidate) {
+		//       ws.send(JSON.stringify({
+		//         type: 'candidate',
+		//         candidate: event.candidate,
+		//       }));
+		//     }
+		//   };
+
+	}
+		//  return function clean(){
+		// 	 console.log('清除函数已执行');
+		// 	 ws.close();
+		//  }
+		DeviceEventEmitter.addListener('ReplayCloseVideo',(node)=>{
+			// setPosterImage(false)
+			if (ws.readyState==1) {
+				console.log(pc)
+				// pc.close();
+				ws.close();
+				// setPosterImage(false)
+				// DeviceEventEmitter.emit('loadVideo')
+				// setTimeout(() => {
+				// 	setWs(new WebSocket(url))
+				// },100)
+			}
+		})
+	},[ws]);
+
+	useEffect(() => {
+		pc.onaddstream = (event) => {
+			console.log('on add Stream:', event.target._remoteStreams);
+			console.log('EVENT.stream：', event.stream);
+			setRemoteStream(event.stream);
+			remoteStreamRef.current = event.stream;
+			console.log('这里是远程流：', JSON.stringify(remoteStream));
+		};
+	},[remoteStream])
+
+useEffect(()=>{
+	console.log('[RS=]',remoteStream);
+})
+	//下面不是effect
+	const handleOffer = async (data) => {
+		console.log('handleOffer is running···········');
+		// console.log('offer is : ',data);
+		try {
+			console.log('data是:');
+			// pc.oniceconnectionstatechange = onICEConnectionchange(data);
+			// pc.onicecandidate = onIceCandidate;
+			await pc.setRemoteDescription(new RTCSessionDescription(data));
+			const answer = await pc.createAnswer();
+			console.log('answer是:', answer);
+			await pc.setLocalDescription(answer);
+			ws.send(JSON.stringify(answer));
+			console.log('发送成功');
+		} catch (err) {
+			console.log('Offer ERROR :', err);
+		}
+	};
+	//icecandidate部分
+	const onRemoteICECandidate = async (data) => {
+		if (pc) {
+			console.log('进入了onremoteicecandidate这个函数了');
+			console.log('====================================');
+			console.log(data.sdpMLineIndex,data.sdpMid,data.candidate);
+			console.log('====================================');
+			// var candidate = new RTCIceCandidate({
+			// 	sdpMLineIndex: data.sdpMLineIndex,
+			// 	sdpMid: data.sdpMid,
+			// 	candidate: data.candidate
+			// });
+			pc.addIceCandidate(
+				new RTCIceCandidate({
+					sdpMLineIndex: data.sdpMLineIndex,
+					sdpMid: data.sdpMid,
+					candidate: data.candidate
+				})
+			);
+			console.log('====================================');
+			console.log('====================================');
+			// console.log('candidatecandidatecandidatecandidatecandidate',candidate);
+			console.log('====================================');
+			console.log('pcpcppcppcpcpcppcpc',pc);
+			console.log('====================================');
+		} else {
+			console.log('pc丢失了');
+		}
+	};
+	
+	//  ice相关  局域网应该没用
+	// const onICEConnectionchange =function on_ICE_Connection_State_Change(e) {
+	//     console.info('ICE Connection State Changed:', e.target.iceConnectionState)
+	//     setIceConnectionState(e.target.iceConnectionState);
+	//     switch (e.target.iceConnectionState) {
+	//       case 'closed':
+	//       case 'disconnected':
+	//       case 'failed':
+	//           if (pc){
+	//               console.log('pc该关掉了')
+	//           }
+	//         break
+	//     }
+	//   }
+	return (
+		<RTCView objectFit='cover'   streamURL={remoteStream?.toURL()} style={styles.stream} />
+	);
+};
+
+const styles = StyleSheet.create({
+	body:{
+		flex:1,
+		justifyContent:'center',
+		alignItems:'center',
+	},
+	stream:{
+		width: '100%',
+		height:'100%'
+	}
+  });
+
+  export default observer(Player)

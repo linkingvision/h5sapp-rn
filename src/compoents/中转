@@ -1,0 +1,162 @@
+import React from 'react'
+import { View, Text } from 'react-native'
+import TreeView from 'react-native-final-tree-view'
+
+export default function ceshi() {
+    const treenode = [
+        {
+        "strName": "root",
+        "strToken": "root",
+        "node": [
+            {
+                "strToken": "34020000001320001173"
+            },
+            {
+                "strToken": "6008--0",
+                "strName": "大华枪击 (0)",
+                "name": "大华枪击 (0)--主码流",
+                "bOnline": true,
+                "iconclass": "listpng2"
+            },
+            {
+                "strName": "5楼",
+                "strToken": "043cffdc-de72-44a3-a852-c4cd446c9374",
+                "node": [
+                    {
+                        "strToken": "6008--0",
+                        "node": [
+                            {
+                                "strToken": "6008--0",
+                                "streamprofile": "main",
+                                "strName": "主码流",
+                                "name": "大华枪击 (0)--主码流",
+                                "iconclass": "listpng"
+                            },
+                            {
+                                "strToken": "6008--0",
+                                "streamprofile": "sub",
+                                "strName": "辅码流",
+                                "name": "大华枪击 (0)--辅码流",
+                                "iconclass": "listpng"
+                            }
+                        ],
+                        "strName": "大华枪击 (0)",
+                        "name": "大华枪击 (0)--主码流",
+                        "bOnline": true,
+                        "iconclass": "listpng2"
+                    },
+                    {
+                        "strName": "32",
+                        "strToken": "8f56d0b6-12b1-4927-b09a-acbeec386a3d",
+                        "node": [
+                            {
+                                "strName": "32",
+                                "strToken": "b68c7197-f67d-4b9d-b527-63a99c2a0586",
+                                "node": [
+                                    {
+                                        "strToken": "34020000001320001173"
+                                    },
+                                    {
+                                        "strToken": "6008--0",
+                                        "node": [
+                                            {
+                                                "strToken": "6008--0",
+                                                "streamprofile": "main",
+                                                "strName": "主码流",
+                                                "name": "大华枪击 (0)--主码流",
+                                                "iconclass": "listpng"
+                                            },
+                                            {
+                                                "strToken": "6008--0",
+                                                "streamprofile": "sub",
+                                                "strName": "辅码流",
+                                                "name": "大华枪击 (0)--辅码流",
+                                                "iconclass": "listpng"
+                                            }
+                                        ],
+                                        "strName": "大华枪击 (0)",
+                                        "name": "大华枪击 (0)--主码流",
+                                        "bOnline": true,
+                                        "iconclass": "listpng2"
+                                    }
+                                ],
+                                "node": [
+                                    {
+                                        "strName": "13123",
+                                        "strToken": "c7ef3b7e-3ec5-464a-8a43-5481358e63df",
+                                        "node": [],
+                                        "node": []
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "strName": "nnn",
+                "strToken": "00116278-f70d-4148-8bb9-0acf62eac584",
+                "node": [
+                    {
+                        "strToken": "6008--0",
+                        "node": [
+                            {
+                                "strToken": "6008--0",
+                                "streamprofile": "main",
+                                "strName": "主码流",
+                                "name": "大华枪击 (0)--主码流",
+                                "iconclass": "listpng"
+                            },
+                            {
+                                "strToken": "6008--0",
+                                "streamprofile": "sub",
+                                "strName": "辅码流",
+                                "name": "大华枪击 (0)--辅码流",
+                                "iconclass": "listpng"
+                            }
+                        ],
+                        "strName": "大华枪击 (0)",
+                        "name": "大华枪击 (0)--主码流",
+                        "bOnline": true,
+                        "iconclass": "listpng2"
+                    }
+                ]
+            }
+        ]
+    }
+]
+    function getIndicator(isExpanded, hasChildrenNodes) {
+        if (!hasChildrenNodes) {
+            return '-'
+        } else if (isExpanded) {
+            return '\\/'
+        } else {
+            return '>'
+        }
+    }
+
+
+
+    return (
+        <View>
+            <TreeView
+                data={treenode} // defined above
+                renderNode={({ node, level, isExpanded, hasChildrenNodes }) => {
+                    return (
+                        <View>
+                            <Text
+                                style={{
+                                    marginLeft: 25 * level,
+                                }}
+                            >
+                                {getIndicator(isExpanded, hasChildrenNodes)} {node.strName}
+                            </Text>
+                        </View>
+                    )
+                }}
+                idKey="strName"
+                childrenKey="node"
+            />
+        </View>
+    )
+}

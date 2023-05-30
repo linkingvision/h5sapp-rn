@@ -1,0 +1,159 @@
+{
+    "strName": "root",
+    "strToken": "root",
+    "node": [
+        {
+            "strToken": "603b--34",
+            "strName": "海康球机A",
+            "name": "海康球机A--主码流",
+            "bOnline": true,
+            "iconclass": "listpng2",
+            "level": 2
+        },
+        {
+            "strToken": "603b--35",
+            "strName": "宇视球机",
+            "name": " 宇视球机--主码流",
+            "bOnline": true,
+            "iconclass": "listpng2",
+            "level": 2
+        },
+        {
+            "strName": "111",
+            "strToken": "b4f80b49-59cc-4978-bd88-25e6aaaf7026",
+            "node": [
+                {
+                    "strToken": "603b--33",
+                    "node": [
+                        {
+                            "strToken": "603b--33",
+                            "streamprofile": "main",
+                            "strName": "主码流",
+                            "name": "海康枪机10--主码流",
+                            "iconclass": "listpng",
+                            "level": 4
+                        },
+                        {
+                            "strToken": "603b--33",
+                            "streamprofile": "sub",
+                            "strName": "辅码流",
+                            "name": "海康枪机10--辅码流",
+                            "iconclass": "listpng",
+                            "level": 4
+                        }
+                    ],
+                    "strName": "海康枪机10",
+                    "name": "海康枪机10--主码流",
+                    "bOnline": true,
+                    "iconclass": "listpng2",
+                    "level": 3
+                },
+                {
+                    "strToken": "603b--34",
+                    "node": [
+                        {
+                            "strToken": "603b--34",
+                            "streamprofile": "main",
+                            "strName": "主码流",
+                            "name": "海康球机A--主码流",
+                            "iconclass": "listpng",
+                            "level": 4
+                        },
+                        {
+                            "strToken": "603b--34",
+                            "streamprofile": "sub",
+                            "strName": "辅码流",
+                            "name": "海康球机A--辅码流",
+                            "iconclass": "listpng",
+                            "level": 4
+                        }
+                    ],
+                    "strName": "海康球机A",
+                    "name": "海康球机A--主码流",
+                    "bOnline": true,
+                    "iconclass": "listpng2",
+                    "level": 3
+                },
+                {
+                    "strName": "222",
+                    "strToken": "7c8c14a7-f286-4251-9a18-e617e87d5495",
+                    "node": [
+                        {
+                            "strToken": "603b--35",
+                            "node": [
+                                {
+                                    "strToken": "603b--35",
+                                    "streamprofile": "main",
+                                    "strName": "主码流",
+                                    "name": "宇视球机--主码流",
+                                    "iconclass": "listpng",
+                                    "level": 5
+                                },
+                                {
+                                    "strToken": "603b--35",
+                                    "streamprofile": "sub",
+                                    "strName": "辅码流",
+                                    "name": "宇视球机--辅码流",
+                                    "iconclass": "listpng",
+                                    "level": 5
+                                }
+                            ],
+                            "strName": "宇视球机",
+                            "name": "宇视球机--主码流",
+                            "bOnline": true,
+                            "iconclass": "listpng2",
+                            "level": 4
+                        },
+                        {
+                            "strToken": "603b--36",
+                            "node": [
+                                {
+                                    "strToken": "603b--36",
+                                    "streamprofile": "main",
+                                    "strName": "主码流",
+                                    "name": "cs--主码流",
+                                    "iconclass": "listpng",
+                                    "level": 5
+                                },
+                                {
+                                    "strToken": "603b--36",
+                                    "streamprofile": "sub",
+                                    "strName": "辅码流",
+                                    "name": "cs--辅码流",
+                                    "iconclass": "listpng",
+                                    "level": 5
+                                }
+                            ],
+                            "strName": "cs",
+                            "name": "cs--主码流",
+                            "bOnline": true,
+                            "iconclass": "listpng2",
+                            "level": 4
+                        }
+                    ],
+                    "level": 3
+                }
+            ],
+            "level": 2
+        },
+        {
+            "strName": "123",
+            "strToken": "ad593be0-022b-47bd-a977-8498634d55e6",
+            "node": [],
+            "level": 2
+        },
+        {
+            "strName": "123",
+            "strToken": "c53e5025-6b4f-458f-8fe7-602053f2072c",
+            "node": [],
+            "level": 2
+        },
+        {
+            "strName": "123",
+            "strToken": "26d80a82-5d9e-43ca-9c0c-c3519a8037aa",
+            "node": [],
+            "level": 2
+        }
+    ],
+    "level": 1
+}

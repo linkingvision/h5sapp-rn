@@ -1,0 +1,1 @@
+import {PanGestureHandler} from 'react-native-gesture-handler'
